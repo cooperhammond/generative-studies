@@ -537,23 +537,81 @@ createumbrella(Scene *s, int color1, int color2)
 }
 
 void
-exportmesh(char* meshname, Mesh* m)
+exportmesh(char* filename, Mesh* m)
 {
-	printf("Vertices:\n[");
+	FILE* stream = fopen(filename, "w");
+
+	fprintf(stream, "%d\n", m->verticeslen);
 	for (int i = 0; i < m->verticeslen; i++)
 	{
-		printf("\t(%lf, %lf, %lf)\n", m->vertices[i].x, m->vertices[i].y, m->vertices[i].z);
+		fprintf(stream, "(, %lf, %lf, %lf ,), ", m->vertices[i].x, m->vertices[i].y, m->vertices[i].z);
 	}
-	printf("]\n");
+	fprintf(stream, "\n");
 
-	printf("Edges: \n[");
+	fprintf(stream, "%d\n", m->edgeslen);
 	for (int i = 0; i < m->edgeslen; i++)
 	{
-		printf("\t(%d, %d)\n", m->edges[i].a, m->edges[i].b);
+		fprintf(stream, "(, %d, %d ,), ", m->edges[i].a, m->edges[i].b);
 	}
-	printf("]\n");
+	fprintf(stream, "\n");
+
+	fclose(stream);
+}
+
+Mesh *
+readmesh(Scene* s, char* filename)
+{
+	FILE* stream = fopen(filename, "r");
+
+	Mesh* mesh = addmesh(s);
+
+	int verticeslen; 
+	fscanf(stream, "%d", &verticeslen);
+
+	printf("%d\n", verticeslen);
+
+	double x, y, z;
+	char drop[20];
+
+	for (int i = 0; i < verticeslen; i++)
+	{
+		fscanf(stream, "%s", drop);
+		fscanf(stream, "%lf", &x);
+		fscanf(stream, "%s", drop);
+		fscanf(stream, "%lf", &y);
+		fscanf(stream, "%s", drop);
+		fscanf(stream, "%lf", &z);
+		fscanf(stream, "%s", drop);
+
+		set3d(&mesh->vertices[mesh->verticeslen], x, y, z);
+		mesh->verticeslen++;
+	
+		// printf("(%lf, %lf, %lf)\n", x, y, z);
+	}
+
+	int edgeslen;
+	fscanf(stream, "%d", &edgeslen);
+
+	// printf("%d\n", edgeslen);
+
+	int a, b;
+
+	for (int i = 0; i < edgeslen; i++)
+	{
+		fscanf(stream, "%s", drop);
+		fscanf(stream, "%d", &a);
+		fscanf(stream, "%s", drop);
+		fscanf(stream, "%d", &b);
+		fscanf(stream, "%s", drop);
+
+		addedge(mesh, a, b, 1);
+		mesh->edgeslen++;
+
+		// printf("(%d, %d)\n", a, b);
+	}
 	
 
+	fclose(stream);
 }
 
 /* draw */
@@ -918,10 +976,12 @@ main(int argc, char *argv[])
 	cam = Cm3d(180, 20, 0);
 	if(!init())
 		return error("Init", "Failure");
-	Mesh* umbrella = createumbrella(&scn, 1, 2);
+	// Mesh* umbrella = createumbrella(&scn, 1, 2);
 	// createbox(&scn, 5, 5, 5, 1);
 
-	exportmesh("umbrella", umbrella);
+	// exportmesh("umbrellamesh.csv", umbrella);
+
+	readmesh(&scn, "umbrellamesh.csv");
 
 	// createicosaedron(&scn, 5, 4);
 	// createpyramid(&scn, 6, 5, 10, 1);
