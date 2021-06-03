@@ -19,8 +19,8 @@ WITH REGARD TO THIS SOFTWARE.
 #define PAD 8
 #define SZ (HOR * VER * 16)
 
-#define VLIMIT 256
-#define ELIMIT 512
+#define VLIMIT 512
+#define ELIMIT 2056
 #define MLIMIT 128
 #define PI 3.14159265358979323846
 
@@ -141,9 +141,9 @@ Sc3d(void)
 {
 	Scene s;
 	s.len = 0;
-	set3d(&s.position, 0, 0, 0);
-	set3d(&s.scale, 1, 1, 1);
-	set3d(&s.rotation, 0, 0, 0);
+	// set3d(&s.position, 0, 0, 0);
+	// set3d(&s.scale, 1, 1, 1);
+	// set3d(&s.rotation, 0, 0, 0);
 	return s;
 }
 
@@ -302,6 +302,9 @@ addvertex(Mesh *m, double x, double y, double z)
 Edge *
 addedge(Mesh *m, int a, int b, int color)
 {
+
+	printf("edge %d\n", m->edgeslen);
+
 	if(m->edgeslen == ELIMIT) {
 		printf("Warning: Reached edge limit\n");
 		return NULL;
@@ -568,7 +571,7 @@ readmesh(Scene* s, char* filename)
 	int verticeslen; 
 	fscanf(stream, "%d", &verticeslen);
 
-	printf("%d\n", verticeslen);
+	// printf("%d\n", verticeslen);
 
 	double x, y, z;
 	char drop[20];
@@ -981,7 +984,7 @@ main(int argc, char *argv[])
 
 	// exportmesh("umbrellamesh.csv", umbrella);
 
-	readmesh(&scn, "umbrellamesh.csv");
+	readmesh(&scn, "mosquemesh.csv");
 
 	// createicosaedron(&scn, 5, 4);
 	// createpyramid(&scn, 6, 5, 10, 1);
