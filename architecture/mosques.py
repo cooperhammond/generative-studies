@@ -8,12 +8,28 @@ import bpy
 import bmesh
 import random
 from math import pi, sin, cos, sqrt
+from mathutils import Euler
 
 # Clear all objects
 def clear_model():
     objs = bpy.data.objects
     for obj in objs:
         objs.remove(obj, do_unlink=True) 
+
+def create_light(location, brightness):
+    light_data = bpy.data.lights.new(name="my-light-data", type='POINT')
+    light_data.energy = brightness
+    
+    light_object = bpy.data.objects.new(name="my-light", object_data=light_data)
+    bpy.context.collection.objects.link(light_object)
+    light_object.location = location
+    
+def create_camera(location, rotation):
+    camera_data = bpy.data.cameras.new(name='Camera')
+    camera_object = bpy.data.objects.new('Camera', camera_data)
+    bpy.context.scene.collection.objects.link(camera_object)
+    camera_object.location = location
+    camera_object.rotation_euler = Euler(rotation, 'XYZ')
 
 def create_object(name, verts, faces, offset):
     mesh = bpy.data.meshes.new(name)
@@ -114,6 +130,15 @@ phH = random.randint(5, 15)
 phVerts, phFaces = make_rect(phL, phW, phH)
 
 create_object("Prayer Hall", phVerts, phFaces, universal_offset)
+
+# ===================== Light
+diff = 10
+create_light((phL + diff, phW + diff, phH + diff), 6000)
+
+# ===================== Camera
+diff1 = 100
+create_camera((phL + diff1, phW / 2 + diff1, phH + diff1),
+              (pi / 2 - .6, 0, .6 + pi / 2))
 
 # Entrance(s)
 dL = 0.5
