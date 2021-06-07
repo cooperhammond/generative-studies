@@ -1,0 +1,18 @@
+shader circle0(
+    vector UV = vector(0.5, 0.5, 0.0),
+    vector Center = vector(0.5, 0.5, 0.0),
+    float Radius = 1.0,
+    float Blur = 0.0,
+    color Outside = color(1.0, 0.0, 0.0),
+    color Inside = 1.0,
+    
+    output color Color = 0.8,
+    output float Fac = 0.5
+) {
+    vector diff = Center - UV;
+    float lenSq = dot(diff, diff);
+    float eval = 0.25 * Radius * Radius - lenSq;
+    float halfBlur = 0.5 * clamp(Blur, 0.0, 1.0);
+    Fac = smoothstep(-halfBlur, halfBlur, eval);
+    Color = mix(Outside, Inside, Fac);
+}
